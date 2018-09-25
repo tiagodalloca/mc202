@@ -44,7 +44,7 @@ void** read_rows(){
 	void** ret = (void**) malloc(sizeof(unsigned short*) + sizeof(Person**));
 	ret[0] = (int*) malloc(sizeof(int)); 
 	*((unsigned short*) ret[0]) = rows_count;
-	ret[1] = (void*) persons;
+	ret[1] = (void*) persons; 
 	return ret;
 }
 
@@ -87,12 +87,17 @@ int main(){
 	sort(persons, rows_count);
 
 	// printa no stdout
-	for(unsigned int i = 0; i < rows_count; i++)
+	for(unsigned int i = 0; i < rows_count; i++){
 		printf("%s, %s, %s, %u\n",
 					 persons[i]->cpf,
 					 persons[i]->nome,
 					 persons[i]->email,
 					 (unsigned int) persons[i]->idade);
+		free(persons[i]);
+	} 
 
+	free((unsigned short *) rows_count_and_persons[0]);
+	free(persons);
+	free(rows_count_and_persons);
 	return 0;
 }
