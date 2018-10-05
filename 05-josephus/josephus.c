@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-int _compare_int(void* v1, void* v2){
-	return *((int*) v1) - *((int*) v2);
+int _compare_str(void* v1, void* v2){
+	return strcmp((char*) v1, (char*) v2);
 }
 
 typedef struct Node {
@@ -165,28 +165,40 @@ void _print_int(void* v){
 }
 
 int main(){
-  char a1, a2, a3, nome[40];
-  No* lista;
+  char a1[20], a2[20], a3[20], nome[20];
+  Node* list;
 
-  while (scanf("%s", &nome) == 1);
+  while (scanf("%20s", nome) == 1);
   // colocar na lista
 
-  scanf("%s\n", &a1);
+  while(1){
+		scanf("%20s", a1);
 
-  if(a1 == "mudar sentido"){
-    lista = _change_direction(lista);
-  }
+		if(a1 == "mudar"){
+			scanf("%20s", a2);
+			list = _change_direction(lista);
+		}
 
-  else{
-    scanf("%s\n", &a2);
+		else if (! strcmp(a1, "sair")) // if equal
+			break;
 
-    if(a1 == "troca"){
-      scanf("%s\n", &a3);
-      lista = _swap(lista, a2, a3);
-    }
-  }
+		else{
+			scanf("%20s", a2);
 
-  else {
+			if(! strcmp(a1,"troca")){
+				scanf("%20s\n", a3);
+				list = _swap(lista, a2, a3);
+			}
 
-  }
+			else if(! strcmp(a2,"+")){
+				list = _plus();
+			}
+			else if(! strcmp(a2,"-")){
+				list = _minus();
+			}
+			else if(! strcmp(a2,"!")){
+				_print(list);
+			}
+		}
+	}
 }
