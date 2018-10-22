@@ -7,10 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-int _compare_str(void* v1, void* v2){
-	return strcmp((char*) v1, (char*) v2);
-}
-
 typedef struct Node {
 	void* info;
 	struct Node* next;
@@ -111,13 +107,14 @@ void _print(void* v){
 	printf("%hu,%s,%s", r->id, r->cpf, r->name);
 }
 
-void _insert_queue(unsigned short n, Node** q, Stack s){
+void _insert_queue(unsigned short n, Node** q, Node** db, Stack s){
 	Register* p = (Register*) malloc(sizeof(Register)); 
 	for(int i = n; i > 0; i--, scanf("%11s,%30s\n",
 																	 p->cpf, p->name)){
 		Register* aux = ((Register*) (q[0] == NULL? _stack_peek(s):q[0]->info));
 		p->id = (aux == NULL? 0:aux->id) + 1;
 		_insert_before(q, p, sizeof(Register));
+		_insert_before(db, p, sizeof(Register));
 	}
 }
 
@@ -147,11 +144,30 @@ void _make_it_so(Node** q, Stack s){
 	}
 }
 
+void _show(Node* n, Node* e){
+	_print(n->info);
+	if (n != e)
+		_show(n->next, e);
+}
+
 void _remove_stack(unsigned short n, Stack s){
 	for(; n > 0; n--)
 		_stack_pop(s);
 }
 
 int main(){
-  Node* list;	
+	char c1;
+	unsigned short d;
+	Node* list, backup;
+	Stack s = stack_default;
+	s.stack = malloc(sizeof(Register*)*30);
+
+	scanf("%c", &c1);
+	if(c1 == 'S'){
+		scanf("%c", &c1);
+		scanf("%hu", &d);
+		if(c1 == 'R')
+			_remove_stack(d, s);
+	}
+	/* else if() */
 }
