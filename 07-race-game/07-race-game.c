@@ -1,21 +1,11 @@
+// TIAGO DALL'OCA RA 206341
+// o código contem alguns comentários, mas é bem direto
+
 #include <stdio.h>
 #include <stdlib.h>
+#include "07-race-game.h"
 
-#define PARENT(i) ((i-1)/2)
-#define LT(i) (2*i+1) /* left node of i */
-#define RT(i) (2*i+2) /* right node of i */
-
-typedef struct{
-	float val;
-	unsigned char* indexes;
-} Node;
-
-typedef struct{
-	Node** v;
-	unsigned int n, max;
-} MaxHeap;
-
-Node* create_node(float f, unsigned char* indexes){
+Node* create_node(float f, unsigned int* indexes){
 	Node* n = (Node*) malloc(sizeof(Node));
 	n->val = f;
 	n->indexes = indexes;
@@ -31,6 +21,8 @@ void switch_adr(void** a, void** b){
 unsigned int goup_heap(MaxHeap *h, unsigned char heap_index, unsigned int k) {
 	if (k > 0 && h->v[PARENT(k)]->val < h->v[k]->val) {
 		unsigned int k_parent_index = PARENT(k);
+		// It's needed to update the reference of the index of this node
+		// as we're switching it
 		h->v[k_parent_index]->indexes[heap_index] = k;
 		switch_adr((void **) &h->v[k], (void **) &h->v[k_parent_index]);
 		return goup_heap(h, heap_index, k_parent_index);
@@ -50,6 +42,7 @@ unsigned int godown_heap(MaxHeap *h, unsigned char heap_index, unsigned int k) {
 			// chooses greater descendant
 			(RT(k) < h->n && h->v[LT(k)]->val < h->v[RT(k)]->val)?RT(k):LT(k);
 		if (h->v[k]->val < h->v[greater_descendant]->val) {
+			// Similar line is seen in goup_heap
 			h->v[greater_descendant]->indexes[heap_index] = k; 
 			switch_adr((void*)&h->v[k], (void*)&h->v[greater_descendant]);
 			return godown_heap(h, heap_index, greater_descendant);
@@ -63,11 +56,18 @@ Node* extract_max(MaxHeap *h, unsigned char heap_index) {
 	Node* last = h->v[h->n - 1];
 	switch_adr((void **) &h->v[0],(void **) &h->v[h->n - 1]);
 	h->n--;
+	// update index reference
 	last->indexes[heap_index] = godown_heap(h, heap_index, 0);
 	return n;
 }
 
-unsigned int artificially_goup_heap(MaxHeap* h, unsigned char heap_index, unsigned int k) {
+
+/* This method is used to bring a node from any location of the heap */
+/* to the very first index. This is done for post removal to keep the */
+/* heap's balance */
+unsigned int artificially_goup_heap(MaxHeap* h,
+																		unsigned char heap_index,
+																		unsigned int k) {
 	if (k > 0) {
 		unsigned int k_parent_index = PARENT(k);
 		h->v[k_parent_index]->indexes[heap_index] = k;
@@ -84,11 +84,10 @@ void extract_node(MaxHeap h[3], unsigned char heap_index, float vals[3]){
 		if(hi != heap_index){
 			vals[hi] = h[hi].v[n->indexes[hi]]->val;
 			artificially_goup_heap(&h[hi], hi, n->indexes[hi]);
-			/* free(extract_max(&h[hi], hi)); */
-			extract_max(&h[hi], hi);
+			free(extract_max(&h[hi], hi));
 		}
-	/* free(n->indexes); */
-	/* free(n); */
+	free(n->indexes);
+	free(n);
 }
 
 int main(int argc, char** args){
@@ -107,7 +106,7 @@ int main(int argc, char** args){
 		for(unsigned int j = 0; j < C; j++){
 			float atrs[3];
 			scanf("%f %f %f", atrs, atrs + 1, atrs + 2);
-			unsigned char* indexes = (unsigned char*) malloc(sizeof(unsigned char)*3);
+			unsigned int* indexes = (unsigned int*) malloc(sizeof(unsigned int)*3);
 			for(unsigned char k = 0; k < 3; k++)
 					insert_heap(h + k, k, create_node(atrs[k], indexes));
 		}
@@ -121,9 +120,10 @@ int main(int argc, char** args){
 		}
 	}
 
-	/* for(unsigned char i = 0; i < 3; i++) */
-	/* 	free(h[i].v); */
-
+	// free up the memory
+	float f[3];
+	while(h[0].n > 0) extract_node(h, 0, f);
+	for(unsigned char i = 0; i < 3; i++) free(h[i].v);
 	return 0;	
 }
 
