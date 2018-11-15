@@ -1,0 +1,85 @@
+#include <stdio.h>
+
+
+
+int pertence(int conj[], int tam, int num)
+{
+	for (int i = 0; i < tam; i++) {
+		if (conj[i] == num) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
+int contido(int conj1[], int conj2[], int tam1, int tam2)
+{
+	for (int i = 0; i < tam1; i++) {
+		if (pertence(conj2, tam2, conj1[i]) == 0) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+
+
+
+int adicao(int conj[], int tam, int num)
+{
+	if (pertence(conj, tam, num) == 0) {
+		conj[tam] = num;
+		tam++;
+	}
+	return tam;
+}
+
+int subtracao(int conj[], int tam, int num)
+{
+	for (int i = 0; i < tam; i++) {
+		if (conj[i] == num) {
+			tam--;
+			conj[i] = conj[tam];
+			break;
+		}
+	}
+	return tam;
+}
+
+
+int uniao(int conjRes[], int conj1[], int conj2[], int tam1, int tam2)
+{
+	int tamRes = tam1;
+	for (int i = 0; i < tam1; i++) {
+		conjRes[i] = conj1[i];
+	}
+	for (int i = 0; i < tam2; i++) {
+		tamRes = adicao(conjRes, tamRes, conj2[i]);
+	}
+	return tamRes;
+}
+
+int intersecao(int conjRes[], int conj1[], int conj2[], int tam1, int tam2)
+{
+	int tamRes = 0;
+	for (int i = 0; i < tam1; i++) {
+		if (pertence(conj2, tam2, conj1[i]) != 0) {
+			conjRes[tamRes] = conj1[i];
+			tamRes++;
+		}
+	}
+	return tamRes;
+}
+
+int diferenca(int conjRes[], int conj1[], int conj2[], int tam1, int tam2)
+{
+	int tamRes = tam1;
+	for (int i = 0; i < tam1; i++) {
+		conjRes[i] = conj1[i];
+	}
+	for (int i = 0; i < tam2; i++) {
+		tamRes = subtracao(conjRes, tamRes, conj2[i]);
+	}
+	return tamRes;
+}
